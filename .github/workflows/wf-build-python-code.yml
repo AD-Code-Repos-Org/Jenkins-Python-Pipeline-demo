@@ -29,7 +29,8 @@ jobs:
 
       - name: Run automated tests
         run: |
-          if [ -f pytest.ini ] || [ -d tests ]; then pytest; else echo "No tests found."; fi
+          #if [ -f pytest.ini ] || [ -d tests ]; then pytest; else echo "No tests found."; fi
+          pytest tests --cov=app --cov-report=xml
 
       - name: Build application (if applicable)
         run: |
