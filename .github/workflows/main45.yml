@@ -11,7 +11,7 @@ on:
   # schedule:
   #   - cron: '0 0 * * *' # Runs every day at midnight UTC
 jobs:
-  build-python-code:
+  build-python-code1:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository code
@@ -34,7 +34,7 @@ jobs:
         # $GITHUB_ENV is a special file that GitHub Actions uses to set environment variables for subsequent steps in the workflow. By appending "PYTHONPATH"=$GITHUB_WORKSPACE to this file, we ensure that the PYTHONPATH variable is available to all subsequent steps in the workflow, allowing Python to locate modules and packages within the repository during test execution.
       - name: Run automated tests
         run: |
-          pytest test --cov=app --cov-report=xml --cov-report=html
+          pytest test --cov=app --cov-report=xml 
           # if [ -f pytest.ini ] || [ -d tests ]; then pytest; else echo "No tests found."; fi
 
       - name: Build application (if applicable)
