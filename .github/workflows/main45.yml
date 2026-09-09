@@ -1,0 +1,42 @@
+---
+name: Build Python Code
+on:
+  workflow_dispatch:
+  push:
+    branches: "master"
+      # - dev
+      # - main
+  pull_request:
+    branches: ["master"]
+  # schedule:
+  #   - cron: '0 0 * * *' # Runs every day at midnight UTC
+jobs:
+  build-python-code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v6
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11' # Specify the desired Python version
+
+      - name: Install dependencies #without this step, the tests will fail if they require any dependencies
+        run: |
+          pip install --upgrade pip 
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      
+      - name: set PythonPATH
+        run: echo "PYTHONPATH"=$GITHUB_WORKSPACE >> $GITHUB_ENV
+        # github_workspace is a default environment variable that points to the root of the repository on the runner VM. This step sets the PYTHONPATH environment variable to the root of the repository, allowing Python to locate modules and packages within the repository during test execution.
+        # it is automatically set by GitHub Actions and points to the root of the repository on the runner VM. This step sets the PYTHONPATH environment variable to the root of the repository, allowing Python to locate modules and packages within the repository during test execution.
+        # $GITHUB_ENV is a special file that GitHub Actions uses to set environment variables for subsequent steps in the workflow. By appending "PYTHONPATH"=$GITHUB_WORKSPACE to this file, we ensure that the PYTHONPATH variable is available to all subsequent steps in the workflow, allowing Python to locate modules and packages within the repository during test execution.
+      - name: Run automated tests
+        run: |
+          pytest test --cov=app --cov-report=xml --cov-report=html
+          # if [ -f pytest.ini ] || [ -d tests ]; then pytest; else echo "No tests found."; fi
+
+      - name: Build application (if applicable)
+        run: |
+          if [ -f setup.py ]; then python setup.py sdist bdist_wheel; else echo "No build script found."; fi
